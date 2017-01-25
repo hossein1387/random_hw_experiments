@@ -1,0 +1,11 @@
+*.nfs*
+*.irun
+*.key
+INCA_libs/
+*.simvision*
+*.history
+*.env
+waves.shm/
+a.out
+irun.log
+obj_dir/

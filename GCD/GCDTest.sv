@@ -14,12 +14,13 @@ initial begin
   int NUM_TESTS = 100;
   int expected_val = 0;
   int test_id = 0;
+  $dumpfile("dff.vcd");
+  $dumpvars;
   rst=1; 
   #500;
   rst = 0;
   a = 14;
   b = 161;
-//  for(int i=0; i<NUM_TESTS; i++) begin
   while(test_id<NUM_TESTS) begin
     a = $urandom_range(1000,10);
     b = $urandom_range(1000,10);    

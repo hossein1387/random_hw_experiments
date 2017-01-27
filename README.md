@@ -1,4 +1,4 @@
-# random_experiments
+# random_hw_experiments
 # What is this?
 
 This repo contains my random experiments designing hardware.

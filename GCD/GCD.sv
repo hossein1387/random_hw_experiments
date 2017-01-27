@@ -52,7 +52,7 @@ always @(*) begin
             end
         end
       s2: begin
-        state_next = s0;
+            state_next = s0;
         end
         default: begin
             state_next = s0;

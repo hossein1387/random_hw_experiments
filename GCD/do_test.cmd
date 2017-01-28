@@ -1,15 +1,9 @@
 #!/bin/csh -f
 
-if ($#argv == 0) then
-    echo "Usage ./do_test.cmd [Test Name] [args...]"
-    exit(1)
-endif
-
 #Test case name
-set tc_name = $argv[1]
-if ($#argv > 1) then
+if ($#argv >= 1) then
 	set args    = $#argv	
-	set j = 2 # tc_name is already parsed!
+	set j = 1 
 	set flags = ""
 	while ( $j <= $args )
 	    switch ($argv[$j])
@@ -31,7 +25,16 @@ if ($#argv > 1) then
 	       endsw
 	  @ j++
 	end
-    irun +access+rwc $tc_name $flags
+    if ( -f files.f) then 
+        set flags = "$flags -f files.f"
+    endif
+    echo "flags = $flags"
+    irun +access+rwc $flags
 else
-   irun +access+rwc $tc_name 
+    if ( -f files.f) then
+        irun +access+rwc -f files.f
+    else
+        echo "Usage ./do_test.cmd [Test Name] [args...]"
+        exit(1)
+    endif
 endif

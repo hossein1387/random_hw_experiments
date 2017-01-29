@@ -1,45 +1,65 @@
+`timescale 1ns/1ps 
+
 module GCDTest;
 logic clk, rst, done;
 logic [31:0] a,b,gcd;
 
 GCD gcd_inst(.clk(clk),.rst_n(rst),.a_in(a), .b_in(b), .done(done), .gcd(gcd));
 
-always #5 clk = !clk;
+initial begin 
+    clk = 0;
+    forever begin
+      #50ns clk = !clk;
+    end
+end
+
 
 function int gcd_fcn(int a, int b);
     return b == 0 ? a : gcd_fcn(b, a % b);
 endfunction
 
+function int gcd_fcn_while(int a, int b);
+  while(a!=b) begin
+      if(a>b) a = a-b;
+      else    b = b-a;       
+  end
+  return a;
+endfunction : gcd_fcn_while
+
 initial begin
-  int NUM_TESTS = 100;
+  int NUM_TESTS = 1000;
   int expected_val = 0;
   int test_id = 0;
-  $dumpfile("dff.vcd");
-  $dumpvars;
   rst=1; 
-  #500;
+  a = 0;
+  b = 0;
+  #500ns;
   rst = 0;
   a = 14;
   b = 161;
   while(test_id<NUM_TESTS) begin
-    a = $urandom_range(1000,10);
-    b = $urandom_range(1000,10);    
   @(posedge done)
     test_id++;
-  expected_val = gcd_fcn(a,b);
+  expected_val = gcd_fcn_while(a,b);
   if(expected_val==gcd) begin
        $display("[%4d]-GCD(%4d,%4d): expected=%4d   actual=%4d  PASS", test_id, a, b, expected_val, gcd); 
   end else begin
        $display("[%4d]-GCD(%4d,%4d): expected=%4d   actual=%4d  FAIL", test_id, a, b, expected_val, gcd);
-       $finish; 
   end
-  #50;
+  #50ns;
+  a = $urandom_range(1000,10);
+  b = $urandom_range(1000,10);
   end
+  $finish();
 end 
 
+initial begin
+  $dumpfile("dump.vcd");
+  $dumpvars(1);
+end
 
 initial begin
-#600us;
+  #600ms;
 $finish();
 end
 

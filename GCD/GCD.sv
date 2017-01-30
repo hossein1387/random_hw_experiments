@@ -48,13 +48,13 @@ always @(*) begin
             gcd        = 32'd0;
             state_next = s1;
         end else begin
-            gcd = a;
             state_next = s2;
-            done = 1;
             end
         end
       s2: begin
+            gcd = a;
             state_next = s0;
+            done = 1;
         end
         default: begin
             state_next = s0;

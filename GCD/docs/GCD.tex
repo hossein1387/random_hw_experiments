@@ -1,30 +1,122 @@
-\section{Designing a GCD:}
+\section{Designing a Greatest Common Divisor Circuit}
+\subsection{Theory}
+Greatest Common Divisor (GCD) of two non zero integers is the largest number that is a common divisor of both integers. In this implementation, we are more focused on circuit size and speed rather than optimizing the algorithm. The common way of computing the GCD can be accomplished by the following algorithm:
 
-In this project, I have designed a circuit to compute the GCD of to 32 bit integer (the design is parameterized to take other width as well) numbers. To compile and run the test, you need to either install [Icarus Verilog](http://iverilog.icarus.com/) (free) or to use Cadence Simvision (need to purchase license). For now the makefile works ony with simvision but it can easily be extended to target iverilog as well. To veiw the waveforms, you can either use [GTKWave](http://gtkwave.sourceforge.net/)(free) or Simvision. To run the test,
-first you need to clone this repository:
+\begin{algorithm}
+\caption{Computing GCD algorithm}\label{euclid gcd}
+\begin{algorithmic}[1]
+\Procedure{GCD(A, B)}{}
+\BState \emph{begin}:
+\If {(A==B)} \textbf{goto} \emph{end}
+\EndIf
+\If {(A>B)} $\textit A \gets A-B$
+\EndIf
+\If {(B<A)} $\textit B \gets B-A$
+\EndIf
+\State \textbf{goto} \emph{begin}
+\BState \emph{end}:
+\State $\textit return \ A$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
-    git clone https://github.com/hossein1387/random_hw_experiments.git
-    cd random_hw_experiments/GCD
+The algorithm subtracts the largest number between the two inputs, from the other one. It will then update the largest input by the result of subtraction. This procedure will be continued until the two numbers are equal. This algorithm can be recursively implemented in System-Verilog as follows:
 
-Then, to compile execute the following command:
 
-    ./do_test.cmd GCDTest.sv
+\begin{minted}{verilog}
+function int gcd_fcn(int a, int b);
+    return b == 0 ? a : gcd_fcn(b, a % b);
+endfunction
+\end{minted}
 
-or to bring up gui and waveform type:
+\subsection{Implementation}
+The behavioral model presented in previous section cannot be implemented in hardware. For that we need to extract the essential computational blocks from the algorithm. We are also going to need a state machine to keep track of states we are in. The state machine should also compute the next state. Adding state machine would increase our design size. This is due to the gate level implementation of registers that are required by the state machine to hold values between clock cycles. This means that one of the best ways of reducing the design size is to reduce the number of states that we need. In the first implementation of GCD, we used 3 states to compute the GCD. The following listing shows only the combinational logic part (the source code for this implementation can be found in \href{https://github.com/hossein1387/random_hw_experiments/blob/master/GCD/GCDopt.sv}{link to GCD repository}):
 
-    ./do_test.cmd GCDTest.sv gui
+\begin{minted}{verilog}
+    case (state)
+      s0: begin
+            a_next      = a_in;
+            b_next      = b_in;
+            gcd         = 32'd0;
+            state_next  = s1; 
+            done        = 0;
+        end
+      s1: begin
+        if(a!=b) begin
+            a_next= (a >= b) ? a - b : a;
+            b_next     = (b >  a) ? b - a : b;
+            gcd        = 32'd0;
+            state_next = s1;
+        end else begin
+            state_next = s2;
+            end
+        end
+      s2: begin
+            gcd = a;
+            state_next = s0;
+            done = 1;
+        end
+        default: begin
+            state_next = s0;
+        end
+    endcase
+\end{minted}
 
-Either way, the GCDTest.sv will instantiate the designed GCD module and tests it by randomly injecting two integers. The GCDTest.sv is responsible to provide the clock and inputs for the Design Under Test (DUT). It also is responsible to verify the DUT outputs. The DUT will notify test when to pickup the output by pulling up the done bit for a clock cycle. The result of running this test will be as follow:
+In the code above, \mintinline{latex}{s0} samples the input and pulls down the $done$ signal (that indicates the output is ready to be sampled). In \mintinline{latex}{s1}, we subtract the largest number from the other one and update the next state. Finally \mintinline{latex}{s2} changes the next state to \mintinline{latex}{s0} and more importantly, pulls up the ``done'' signal and outputs the result on the output line. Figure \ref{SCHEMATIC} shows the schematic view of the circuit:
 
-    ncsim> run
-    [   1]-GCD(  97, 532): expected=   1   actual=   1  PASS
-    [   2]-GCD( 718, 114): expected=   2   actual=   2  PASS
-    [   3]-GCD( 979, 862): expected=   1   actual=   1  PASS
-    [   4]-GCD(  90,  65): expected=   5   actual=   5  PASS
-    [   5]-GCD( 409, 134): expected=   1   actual=   1  PASS
-    ...
-    [  99]-GCD( 658, 566): expected=   2   actual=   2  PASS
-    [ 100]-GCD( 525, 605): expected=   5   actual=   5  PASS
-    Simulation complete via $finish(1) at time 600 US + 0
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Images/schematic.png}
+    \caption{High level Schematic view of GCD implementation showing combinational and sequential logic }
+    \label{SCHEMATIC}
+\end{figure}
 
-The output shows the expected result (generated by the test) versus the actual result (calculated by the dut).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Images/GCDNormal.png}
+    \caption{GCD optimized}
+    \label{GCDNORMAL}
+\end{figure}
+
+Figure \ref{GCDNORMAL} shows the waveform generated by GTKWave. As it is illustrated, GCD 14 and 161 is computed after 12 clock cycles and after that the ``done'' signal stays high for one clock cycle. As described earlier, by reducing number of states in the state machine, we can reduce the circuit size.  
+
+To reduce the number of states, we can combine states 1 and 2 so that only 1 bit is required to hold the state and we will end up with less number of registers. The following listing shows how this can be achieved:
+\begin{minted}{verilog}
+    case (state)
+      s0: begin
+            a_next      = a_in;
+            b_next      = b_in;
+            gcd         = 32'd0;
+            state_next  = s1; 
+            done        = 0;
+        end
+      s1: begin
+        if(a!=b) begin
+            a_next= (a >= b) ? a - b : a;
+            b_next     = (b >  a) ? b - a : b;
+            gcd        = 32'd0;
+            state_next = s1;
+        end else begin
+            gcd = a;
+            state_next = s0;
+            done = 1;
+            end
+        end
+        default: begin
+            state_next = s0;
+        end
+\end{minted}
+
+Figure \ref{GCDOPT} shows that the same result is achieved but with less number of registers. The synthesis of this circuit is done using Yosys 3.0 available at 
+\href{https://www.edaplayground.com/x/4reN}{Synthesis Result}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Images/GCDOpt.png}
+    \caption{GCD optimized}
+    \label{GCDOPT}
+\end{figure}
+
+\subsection{Results and Source Code}
+
+\markdownInput{GCD.md}

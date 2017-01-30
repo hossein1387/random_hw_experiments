@@ -54,7 +54,7 @@ initial begin
 end 
 
 initial begin
-  $dumpfile("dump.vcd");
+  $dumpfile("gcd_normal.vcd");
   $dumpvars(1);
 end
 

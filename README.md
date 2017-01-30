@@ -4,7 +4,7 @@
 This repo contains my random experiments designing hardware.
 
 
-#Desiging a Circuit for computing Greatest Common Diviser(GCD):
+#Desiging a Circuit for computing Greatest Common Divisor(GCD):
 
 In this project, we designed a circuit to compute the GCD of two 32-bit integers numbers. To compile and run the test, you need to either install [Icarus Verilog](http://iverilog.icarus.com/) (free) or to use Cadence Simvision (need to purchase license). The script works with both simvision and iverilog. To view the waveforms, you can use [GTKWave](http://gtkwave.sourceforge.net/)(free) or Simvision. To run the test,
 first you need to clone this repository:

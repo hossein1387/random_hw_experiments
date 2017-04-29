@@ -4,7 +4,7 @@ GEN = icepack
 PROG = iceprog
 BOARD = iCEStick
 
-TOP = ClockGen.v
+TOP = SimpleLed.v
 PCF = $(BOARD).pcf
 DEVICE = 8k
 

@@ -42,6 +42,12 @@ This repo contains my experiments with Lattice iCE platform. Use the following c
     make BOARD=iCE40HX8K
 
 This will create the project for iCE40HX8K board (other option=iCEStick). It will automatically use the corresponding Physical Constraints File (pcf).  
+Make sure you have the follwoing tools installed:
+    
+* [yosys](https://github.com/cliffordwolf/yosys) (For synthesis)
+* [arachne-pnr](https://github.com/cseed/arachne-pnr) (Place and route tool) 
+* [icestorm](https://github.com/cliffordwolf/icestorm) (Tools for analyzing and creating bitstream files )
+
 
 
 ## License

@@ -6,7 +6,13 @@ BOARD = iCEStick
 
 TOP = SimpleLed.v
 PCF = $(BOARD).pcf
-DEVICE = 8k
+      
+ifeq (iCE40HX8K,$(BOARD))
+	DEVICE = 8k
+else
+	DEVICE = 1k
+endif
+
 
 OUTPUT = $(patsubst %.v,%.bin,$(TOP))
 

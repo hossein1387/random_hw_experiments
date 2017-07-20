@@ -4,14 +4,14 @@ set IVERILOG_EXIST=0
 set SIM=""
 
 which irun >& /dev/null
-if ($? != 1) then
+if ($status != 1) then
     echo "found irun on this system!"
     set SIM="irun"
     set IRUN_EXIST=1    
 endif
 
 which iverilog >& /dev/null
-if ($? != 1) then
+if ($status != 1) then
     echo "found iverilog on this system!"
     set SIM="iverilog"
     set IVERILOG_EXIST=1

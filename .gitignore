@@ -9,3 +9,7 @@ waves.shm/
 a.out
 irun.log
 obj_dir/
+*.log
+*.tcl
+*.pb
+*.jou

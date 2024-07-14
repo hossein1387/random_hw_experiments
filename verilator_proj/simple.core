@@ -1,0 +1,37 @@
+CAPI=2:
+
+name : ::simple_core:0
+
+filesets:
+  rtl:
+    files:
+      - vsrc/simple.sv
+    file_type: systemVerilogSource
+  tb:
+    files:
+      - tb/verilator/lowrisc_dv_verilator_simutil_verilator/cpp/verilator_sim_ctrl.cc
+      - tb/verilator/lowrisc_dv_verilator_simutil_verilator/cpp/verilated_toplevel.cc
+      - tb/verilator/lowrisc_dv_verilator_simutil_verilator/cpp/verilated_toplevel.h: {is_include_file: true}
+      - tb/verilator/lowrisc_dv_verilator_simutil_verilator/cpp/verilator_sim_ctrl.h: {is_include_file: true}
+      - tb/verilator/lowrisc_dv_verilator_simutil_verilator/cpp/sim_ctrl_extension.h: {is_include_file: true}
+      - tb/main.cpp
+      - tb/simple_tb.sv
+    file_type: systemVerilogSource
+    file_type: cppSource
+
+targets:
+  default:
+    filesets:
+      - rtl
+      - tb
+    tools: 
+        verilator:
+            verilator_options: [-O3,-CFLAGS, "-std=c++20", 
+                                    -CFLAGS, "-I/tb/verilator/lowrisc_dv_verilator_simutil_verilator/cpp",
+                                    -CFLAGS, "-DTOPLEVEL_NAME=simple_tb",
+                                    --timing,
+                                    --trace-fst,
+                                    -Wno-INSECURE,
+                                    --DTOPLEVEL_NAME=simple_tb, 
+                                    -Wno-BLKANDNBLK, -Wno-CASEINCOMPLETE, -Wno-CMPCONST, -Wno-LATCH, -Wno-LITENDIAN, -Wno-UNOPTFLAT, -Wno-UNPACKED, -Wno-UNSIGNED, -Wno-WIDTH, -Wno-WIDTHCONCAT, --hierarchical]
+    toplevel: simple_tb

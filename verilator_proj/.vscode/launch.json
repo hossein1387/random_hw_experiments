@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/hossein/MyRepos/random_hw_experiments/verilator_proj",
+      "program": "/Users/hossein/MyRepos/random_hw_experiments/verilator_proj/build/Debug/outDebug"
+    }
+  ]
+}

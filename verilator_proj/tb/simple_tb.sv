@@ -13,7 +13,7 @@ simple uut (
 initial begin
     $dumpfile("simple_tb.vcd");
     $dumpvars(0, simple_tb);
-    #100 $finish;
+    // #1000 $finish;
 end
 
 // always #5 clk = ~clk;

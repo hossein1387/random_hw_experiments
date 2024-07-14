@@ -1,0 +1,5 @@
+Run the following command:
+
+    fusesoc library add simple .
+    fusesoc run --target=default --tool=verilator ::simple_core:0
+    gtkwave build/simple_core_0/default-verilator/simple_tb.vcd
